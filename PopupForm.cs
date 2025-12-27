@@ -6,8 +6,9 @@ public sealed class PopupForm : Form
 {
     private readonly System.Windows.Forms.Timer _timer = new();
 
-    public PopupForm(string text, AppSettings settings)
+    public PopupForm(string nameText, string extraText, AppSettings settings)
     {
+        // —— 窗体基础属性 ——
         FormBorderStyle = FormBorderStyle.FixedDialog;
         StartPosition = FormStartPosition.Manual;
         TopMost = true;
@@ -15,48 +16,90 @@ public sealed class PopupForm : Form
         MinimizeBox = false;
         ShowInTaskbar = false;
 
-        var font = new Font("Segoe UI", settings.PopupFontSize, FontStyle.Bold);
+        // —— DPI 感知缩放系数 ——
+        float dpiScale = DeviceDpi / 96f;
 
-        var label = new Label
+        // —— 字体层级（名字 / 说明） ——
+        var nameFont = new Font(
+            "Segoe UI",
+            settings.PopupFontSize,
+            FontStyle.Bold,
+            GraphicsUnit.Point
+        );
+
+        var extraFont = new Font(
+            "Segoe UI",
+            settings.PopupFontSize * 0.5f,   // ✅ 小一半
+            FontStyle.Regular,
+            GraphicsUnit.Point
+        );
+
+        // —— 标签：名字 ——
+        var lblName = new Label
         {
-            AutoSize = false,
-            Dock = DockStyle.Fill,
+            AutoSize = true,
             TextAlign = ContentAlignment.MiddleCenter,
-            Font = font,
-            Text = text
+            Font = nameFont,
+            Text = nameText,
+            Dock = DockStyle.Top
         };
-        Controls.Add(label);
 
-        // —— 自适配大小（测量文本 + padding）——
-        // 给一个舒适的内边距
-        int pad = 26;
+        // —— 标签：剩余说明 ——
+        var lblExtra = new Label
+        {
+            AutoSize = true,
+            TextAlign = ContentAlignment.MiddleCenter,
+            Font = extraFont,
+            ForeColor = Color.DimGray,
+            Text = extraText,
+            Dock = DockStyle.Top,
+            Padding = new Padding(0, (int)(8 * dpiScale), 0, 0)
+        };
 
-        // 估算最大宽度：屏幕工作区的 55%
+        // —— 容器（避免挤在一起） ——
+        var panel = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            FlowDirection = FlowDirection.TopDown,
+            WrapContents = false,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            Padding = new Padding(
+                (int)(32 * dpiScale),
+                (int)(24 * dpiScale),
+                (int)(32 * dpiScale),
+                (int)(24 * dpiScale)
+            )
+        };
+
+        panel.Controls.Add(lblName);
+        panel.Controls.Add(lblExtra);
+        Controls.Add(panel);
+
+        // —— 先让 WinForms 计算理想尺寸 ——
+        AutoSize = true;
+        AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        PerformLayout();
+
+        // —— 限制最大宽度（防止超宽） ——
         var wa = Screen.PrimaryScreen!.WorkingArea;
-        int maxW = (int)(wa.Width * 0.55);
-        int minW = 320;
+        int maxWidth = (int)(wa.Width * 0.7);
+        if (Width > maxWidth)
+            Width = maxWidth;
 
-        // 先用一个宽度测量高度（模拟换行）
-        var proposed = new Size(maxW - pad * 2, int.MaxValue);
-        var flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak;
-        var measured = TextRenderer.MeasureText(text, font, proposed, flags);
+        // —— 位置：屏幕上半部分 + 水平居中 + 顶部留空 ——
+        int topMargin = (int)(wa.Height * 0.12); // 距顶端约 12%
+        Left = wa.Left + (wa.Width - Width) / 2;
+        Top = wa.Top + topMargin;
 
-        int w = Math.Clamp(measured.Width + pad * 2, minW, maxW);
-        int h = Math.Clamp(measured.Height + pad * 2, 140, (int)(wa.Height * 0.35));
-
-        Width = w;
-        Height = h;
-
-        // 右下角
-        Left = wa.Right - Width - 20;
-        Top = wa.Bottom - Height - 20;
-
-        _timer.Interval = Math.Max(500, settings.PopupAutoCloseMs); // 固定 5s 也可以
+        // —— 5 秒自动关闭 ——
+        _timer.Interval = Math.Max(500, settings.PopupAutoCloseMs);
         _timer.Tick += (_, __) => Close();
         _timer.Start();
 
         Click += (_, __) => Close();
-        label.Click += (_, __) => Close();
+        lblName.Click += (_, __) => Close();
+        lblExtra.Click += (_, __) => Close();
     }
 
     protected override void OnFormClosed(FormClosedEventArgs e)

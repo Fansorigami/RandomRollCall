@@ -76,18 +76,18 @@ public sealed class MainForm : Form
         _tray.DoubleClick += (_, __) => DoPick();
     }
 
-    private void DoPick()
-    {
-        var name = _roll.Pick();
-        var total = _roll.Total;
+private void DoPick()
+{
+    var name = _roll.Pick();
+    var total = _roll.Total;
 
-        string extra = _roll.NoRepeatMode
-            ? $"（本轮剩余：{_roll.RemainingInRound}/{total}）"
-            : $"（允许重复，总人数：{total}）";
+    string extra = _roll.NoRepeatMode
+        ? $"本轮剩余：{_roll.RemainingInRound} / {total}"
+        : $"允许重复，总人数：{total}";
 
-        using var pop = new PopupForm($"🎲 点到：{name}\n{extra}", _settings);
-        pop.ShowDialog();
-    }
+    using var pop = new PopupForm(name, extra, _settings);
+    pop.ShowDialog();
+}
 
     private void OpenSettings()
     {
