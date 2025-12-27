@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 public sealed class PopupForm : Form
 {
-    private readonly Timer _timer = new();
+    private readonly System.Windows.Forms.Timer _timer = new();
 
     public PopupForm(string text, AppSettings settings)
     {
