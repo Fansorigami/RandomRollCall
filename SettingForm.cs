@@ -52,7 +52,7 @@ public sealed class SettingsForm : Form
         Controls.Add(root);
 
         _hint.Dock = DockStyle.Fill;
-        _hint.Text = "提示：名单每行一个名字；触发键建议用 F8 / Pause / ScrollLock。";
+        _hint.Text = $"提示：名单每行一个名字；触发键建议用 F8 / Pause / ScrollLock。  |  版本：{VersionInfo.GetAppVersion()}";
         _hint.ForeColor = Color.DimGray;
         root.Controls.Add(_hint, 0, 0);
 

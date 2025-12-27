@@ -74,6 +74,11 @@ public sealed class MainForm : Form
         };
 
         _tray.DoubleClick += (_, __) => DoPick();
+
+        var itemUpdate = new ToolStripMenuItem("检查更新…", null, async (_, __) =>
+      {
+         await UpdateChecker.CheckForUpdatesAsync(this);
+      });
     }
 
 private void DoPick()
