@@ -19,6 +19,7 @@ public sealed class SettingsForm : Form
     private readonly NumericUpDown _numFontSize = new();
     private readonly Button _btnSave = new();
     private readonly Button _btnCancel = new();
+    private readonly Button _btnCheckUpdate = new();
 
     private bool _capturing = false;
 
@@ -106,6 +107,14 @@ public sealed class SettingsForm : Form
 
         var btnRow = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft };
 
+        _btnCheckUpdate.Text = "检查更新";
+        _btnCheckUpdate.Width = 110;
+        _btnCheckUpdate.Click += async (_, __) =>
+        {
+            // 使用最轻量的 GitHub Release latest 检查
+            await UpdateChecker.CheckForUpdatesAsync(this);
+        };
+
         _btnSave.Text = "保存";
         _btnSave.Width = 110;
         _btnSave.Click += (_, __) => SaveAndClose();
@@ -116,6 +125,7 @@ public sealed class SettingsForm : Form
 
         btnRow.Controls.Add(_btnSave);
         btnRow.Controls.Add(_btnCancel);
+        btnRow.Controls.Add(_btnCheckUpdate);
         root.Controls.Add(btnRow, 0, 7);
     }
 
@@ -141,8 +151,8 @@ public sealed class SettingsForm : Form
     {
         _capturing = false;
         _hint.Text = canceled
-            ? "已取消捕获。提示：触发键建议用 F8 / Pause / ScrollLock。"
-            : "提示：名单每行一个名字；触发键建议用 F8 / Pause / ScrollLock。";
+            ? $"已取消捕获。提示：触发键建议用 F8 / Pause / ScrollLock。  |  版本：{VersionInfo.GetDisplayVersion()}"
+            : $"提示：名单每行一个名字；触发键建议用 F8 / Pause / ScrollLock。  |  版本：{VersionInfo.GetDisplayVersion()}";
         _hint.ForeColor = Color.DimGray;
 
         _txtNames.Enabled = true;

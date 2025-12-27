@@ -55,12 +55,17 @@ public sealed class MainForm : Form
 
         var itemPick = new ToolStripMenuItem("随机点名（或按触发键）", null, (_, __) => DoPick());
         var itemSettings = new ToolStripMenuItem("设置…", null, (_, __) => OpenSettings());
+        var itemUpdate = new ToolStripMenuItem("检查更新…", null, async (_, __) =>
+        {
+            await UpdateChecker.CheckForUpdatesAsync(this);
+        });
         var itemOpenNames = new ToolStripMenuItem("打开 names.txt", null, (_, __) => OpenNamesFile());
         var itemExit = new ToolStripMenuItem("退出", null, (_, __) => ExitApp());
 
         _menu.Items.Add(itemPick);
         _menu.Items.Add(new ToolStripSeparator());
         _menu.Items.Add(itemSettings);
+        _menu.Items.Add(itemUpdate);
         _menu.Items.Add(itemOpenNames);
         _menu.Items.Add(new ToolStripSeparator());
         _menu.Items.Add(itemExit);
@@ -74,11 +79,6 @@ public sealed class MainForm : Form
         };
 
         _tray.DoubleClick += (_, __) => DoPick();
-
-        var itemUpdate = new ToolStripMenuItem("检查更新…", null, async (_, __) =>
-      {
-         await UpdateChecker.CheckForUpdatesAsync(this);
-      });
     }
 
 private void DoPick()
