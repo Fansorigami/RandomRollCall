@@ -28,14 +28,14 @@ public static class UpdateChecker
             var latestTag = root.GetProperty("tag_name").GetString() ?? "";
             var htmlUrl   = root.GetProperty("html_url").GetString() ?? "";
 
-            var current = NormalizeVersion(VersionInfo.GetAppVersion());
-            var latest  = NormalizeVersion(latestTag);
+            var current = NormalizeVersion(VersionInfo.GetCleanSemVer()); // ✅ 只比较干净版本
+            var latest  = NormalizeVersion(latestTag);                    // latestTag 一般是 v1.0.1
 
             if (CompareSemVer(latest, current) > 0)
             {
                 var r = MessageBox.Show(
                     ownerWindow,
-                    $"发现新版本：{latestTag}\n当前版本：{VersionInfo.GetAppVersion()}\n\n要打开下载页面吗？",
+                    $"发现新版本：{latestTag}\n当前版本：{VersionInfo.GetDisplayVersion()}\n\n要打开下载页面吗？",
                     "检查更新",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Information
