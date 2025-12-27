@@ -48,7 +48,7 @@ public static class UpdateChecker
             {
                 MessageBox.Show(
                     ownerWindow,
-                    $"你已经是最新版本啦！\n当前版本：{VersionInfo.GetAppVersion()}",
+                    $"你已经是最新版本啦！\n当前版本：{VersionInfo.GetDisplayVersion()}",
                     "检查更新",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
