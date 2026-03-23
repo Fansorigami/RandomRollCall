@@ -20,16 +20,17 @@ public sealed class PopupForm : Form
         float dpiScale = DeviceDpi / 96f;
 
         // —— 字体层级（名字 / 说明） ——
+        // 需求：名字字号再扩大一倍
         var nameFont = new Font(
             "Segoe UI",
-            settings.PopupFontSize,
+            settings.PopupFontSize * 2f,
             FontStyle.Bold,
             GraphicsUnit.Point
         );
 
         var extraFont = new Font(
             "Segoe UI",
-            settings.PopupFontSize * 0.5f,   // ✅ 小一半
+            settings.PopupFontSize,   // 与名字比例保持原先 2:1
             FontStyle.Regular,
             GraphicsUnit.Point
         );
@@ -81,11 +82,18 @@ public sealed class PopupForm : Form
         AutoSizeMode = AutoSizeMode.GrowAndShrink;
         PerformLayout();
 
+        // —— 需求：弹窗尺寸再扩大一倍 ——
+        int targetWidth = Width * 2;
+        int targetHeight = Height * 2;
+
         // —— 限制最大宽度（防止超宽） ——
         var wa = Screen.PrimaryScreen!.WorkingArea;
         int maxWidth = (int)(wa.Width * 0.7);
-        if (Width > maxWidth)
-            Width = maxWidth;
+        Width = Math.Min(targetWidth, maxWidth);
+
+        // 保证高度可控，不超出屏幕高度（留小空白）
+        int maxHeight = (int)(wa.Height * 0.8);
+        Height = Math.Min(targetHeight, maxHeight);
 
         // —— 位置：屏幕上半部分 + 水平居中 + 顶部留空 ——
         int topMargin = (int)(wa.Height * 0.12); // 距顶端约 12%
