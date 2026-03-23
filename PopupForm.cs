@@ -20,7 +20,7 @@ public sealed class PopupForm : Form
         float dpiScale = DeviceDpi / 96f;
 
         // —— 字体层级（名字 / 说明） ——
-        // 需求：名字字号再扩大一倍
+        // 需求：名字字号扩大一倍
         var nameFont = new Font(
             "Segoe UI",
             settings.PopupFontSize * 2f,
